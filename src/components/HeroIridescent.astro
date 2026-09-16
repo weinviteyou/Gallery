@@ -1,12 +1,12 @@
 ---
 interface Props {
   headline: string;
-  statement?: string;
-  /** Full viewport height on the home page, shorter on inner pages. */
+  /** Quiet label pinned at the bottom-left, in the 11px register. */
+  caption?: string;
   full?: boolean;
 }
 
-const { headline, statement, full = false } = Astro.props;
+const { headline, caption, full = false } = Astro.props;
 ---
 
 <section
@@ -17,12 +17,17 @@ const { headline, statement, full = false } = Astro.props;
 >
   <!-- Wash keeps the display type legible over the gradient without tinting it. -->
   <div class="absolute inset-0 bg-obsidian/25 pointer-events-none"></div>
-  <div class="shell relative pb-16 pt-40 text-paper">
-    <h1 class="text-display font-normal m-0 tracking-[-0.02em]">{headline}</h1>
-    {
-      statement && (
-        <p class="text-heading font-light max-w-[18ch] mt-10 mb-0">{statement}</p>
-      )
-    }
+
+  <!-- The display headline owns the viewport; nothing crowds it. -->
+  <div class="shell relative pb-20 pt-40 text-paper">
+    <h1 class="text-display font-normal m-0 tracking-[-0.03em]">{headline}</h1>
   </div>
+
+  {
+    caption && (
+      <div class="shell relative pb-10 text-paper">
+        <p class="label m-0 opacity-80">{caption}</p>
+      </div>
+    )
+  }
 </section>

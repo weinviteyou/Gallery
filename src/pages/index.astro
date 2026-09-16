@@ -11,7 +11,15 @@ const featured = getFeatured(6);
 ---
 
 <BaseLayout inverseNav>
-  <HeroIridescent headline={site.heroHeadline} statement={site.heroStatement} full />
+  <HeroIridescent headline={site.heroHeadline} caption={site.tagline} full />
+
+  <section class="section">
+    <div class="shell">
+      <p class="text-heading font-light m-0 max-w-[20ch] tracking-[-0.01em]">
+        {site.heroStatement}
+      </p>
+    </div>
+  </section>
 
   <section id="work" class="section">
     <div class="shell">
