@@ -1,0 +1,38 @@
+---
+import { site } from '../../site.config';
+
+interface Props {
+  /** Nav sits on a dark hero on the home page. */
+  inverse?: boolean;
+}
+
+const { inverse = false } = Astro.props;
+const current = Astro.url.pathname;
+---
+
+<header
+  class:list={[
+    'absolute top-0 left-0 right-0 z-50',
+    inverse ? 'text-paper' : 'text-obsidian',
+  ]}
+>
+  <nav class="shell flex items-center justify-between py-7" aria-label="Primary">
+    <a href="/" class="link-quiet label">{site.name}</a>
+    <ul class="flex items-center gap-7 list-none m-0 p-0">
+      {
+        site.nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="link-quiet label"
+              style={current === item.href ? 'opacity:.55' : undefined}
+              aria-current={current === item.href ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>

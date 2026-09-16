@@ -1,0 +1,58 @@
+---
+import { Image } from 'astro:assets';
+import { imageFor, slugFor, type Artwork } from '../lib/artworks';
+
+interface Props {
+  artwork: Artwork;
+  /** Alternates the asymmetric text/image arrangement. */
+  flip?: boolean;
+  index?: number;
+}
+
+const { artwork, flip = false, index } = Astro.props;
+const image = imageFor(artwork);
+const href = `/art/${slugFor(artwork)}`;
+---
+
+<article class="grid gap-x-10 gap-y-6 md:grid-cols-12 items-end">
+  <div
+    class:list={[
+      'md:col-span-8',
+      flip ? 'md:order-2 md:col-start-5' : 'md:order-1',
+    ]}
+  >
+    <a href={href} class="media-reveal block link-quiet">
+      {
+        image && (
+          <Image
+            src={image}
+            alt={artwork.title}
+            widths={[640, 960, 1280, 1600]}
+            sizes="(min-width: 768px) 66vw, 100vw"
+            loading={index !== undefined && index < 2 ? 'eager' : 'lazy'}
+          />
+        )
+      }
+    </a>
+  </div>
+  <div
+    class:list={[
+      'md:col-span-4 pb-2',
+      flip ? 'md:order-1 md:col-start-1 md:row-start-1' : 'md:order-2',
+    ]}
+  >
+    {
+      index !== undefined && (
+        <p class="label text-felt-gray m-0 mb-4">
+          {String(index + 1).padStart(2, '0')}
+        </p>
+      )
+    }
+    <h3 class="text-subheading font-normal m-0">
+      <a href={href} class="link-quiet">{artwork.title}</a>
+    </h3>
+    <p class="label text-felt-gray mt-4 mb-0">
+      {[artwork.medium, artwork.year].filter(Boolean).join(' — ')}
+    </p>
+  </div>
+</article>

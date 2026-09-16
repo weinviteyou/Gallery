@@ -1,0 +1,83 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  categoryLabels,
+  getVisibleArtworks,
+  imageFor,
+  slugFor,
+} from '../../lib/artworks';
+
+export function getStaticPaths() {
+  // Only visible artworks get a route, so hidden work has no reachable URL.
+  const artworks = getVisibleArtworks();
+  return artworks.map((artwork, i) => ({
+    params: { slug: slugFor(artwork) },
+    props: {
+      artwork,
+      prev: artworks[i - 1] ?? artworks[artworks.length - 1],
+      next: artworks[i + 1] ?? artworks[0],
+    },
+  }));
+}
+
+const { artwork, prev, next } = Astro.props;
+const image = imageFor(artwork);
+const meta = [
+  ['Category', categoryLabels[artwork.category]],
+  ['Year', artwork.year],
+  ['Medium', artwork.medium],
+  ['Dimensions', artwork.dimensions],
+].filter(([, value]) => Boolean(value));
+const single = prev === artwork && next === artwork;
+---
+
+<BaseLayout title={artwork.title} description={artwork.description || `${artwork.title} — ${artwork.medium}`}>
+  <section class="shell pt-32 pb-24">
+    <a href="/gallery" class="link-quiet label text-felt-gray">Back to gallery</a>
+
+    <div class="mt-10">
+      {
+        image && (
+          <Image
+            src={image}
+            alt={artwork.title}
+            widths={[720, 1080, 1440, 1920]}
+            sizes="(min-width: 1078px) 1078px, 100vw"
+            loading="eager"
+          />
+        )
+      }
+    </div>
+
+    <div class="grid gap-10 md:grid-cols-12 mt-12">
+      <div class="md:col-span-7">
+        <h1 class="text-heading-sm font-normal m-0">{artwork.title}</h1>
+        {artwork.description && <p class="text-body mt-8 mb-0 max-w-[58ch]">{artwork.description}</p>}
+      </div>
+      <dl class="md:col-span-4 md:col-start-9 m-0">
+        {
+          meta.map(([label, value]) => (
+            <div class="hairline py-4 flex justify-between gap-6">
+              <dt class="label text-felt-gray m-0">{label}</dt>
+              <dd class="label m-0 text-right">{value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+
+    {
+      !single && (
+        <nav class="hairline mt-20 pt-6 flex justify-between gap-6" aria-label="Artwork">
+          <a class="link-quiet label" href={`/art/${slugFor(prev)}`}>
+            ← {prev.title}
+          </a>
+          <a class="link-quiet label text-right" href={`/art/${slugFor(next)}`}>
+            {next.title} →
+          </a>
+        </nav>
+      )
+    }
+  </section>
+</BaseLayout>

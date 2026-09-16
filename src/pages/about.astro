@@ -1,0 +1,41 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import PillButton from '../components/PillButton.astro';
+import { site } from '../../site.config';
+
+const portraits = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/art/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP,AVIF}',
+  { eager: true }
+);
+const portraitEntry = site.about.portrait
+  ? Object.entries(portraits).find(([path]) => path.endsWith(`/${site.about.portrait}`))
+  : undefined;
+const portrait = portraitEntry?.[1].default ?? null;
+---
+
+<BaseLayout title="About" description={site.about.paragraphs[0]}>
+  <PageHeader eyebrow="Studio" title={site.about.heading} />
+
+  <section class="pb-28">
+    <div class="shell grid gap-12 md:grid-cols-12 items-start">
+      <div class="md:col-span-7">
+        {site.about.paragraphs.map((p) => <p class="text-body mt-0 mb-7 max-w-[62ch]">{p}</p>)}
+        <PillButton href={`mailto:${site.email}`} class="mt-6">Get in touch</PillButton>
+      </div>
+      <div class="md:col-span-5 md:col-start-8">
+        {
+          portrait ? (
+            <div class="media-reveal">
+              <Image src={portrait} alt={site.name} widths={[480, 720, 960]} sizes="(min-width: 768px) 40vw, 100vw" />
+            </div>
+          ) : (
+            <div class="iridescent aspect-[4/5] w-full" aria-hidden="true" />
+          )
+        }
+        <p class="label text-felt-gray mt-5 mb-0">{site.location}</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

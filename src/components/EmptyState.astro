@@ -1,0 +1,16 @@
+---
+interface Props {
+  message?: string;
+}
+
+const {
+  message = 'No work is published yet. Add images to src/assets/art/, run npm run admin, and switch on what should be public.',
+} = Astro.props;
+---
+
+<div class="hairline pt-8">
+  <p class="text-subheading font-light m-0 max-w-[22ch]">Nothing here yet.</p>
+  <p class="label text-felt-gray mt-6 mb-0 max-w-[60ch] normal-case tracking-normal">
+    {message}
+  </p>
+</div>

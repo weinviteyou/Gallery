@@ -1,0 +1,37 @@
+---
+import { site } from '../../site.config';
+const year = new Date().getFullYear();
+---
+
+<footer class="section band-dark">
+  <div class="shell">
+    <div class="grid gap-10 sm:grid-cols-3">
+      <div>
+        <p class="label m-0 text-ash-mist">Studio</p>
+        <p class="label m-0 mt-3">{site.name}</p>
+        <p class="label m-0 text-ash-mist">{site.location}</p>
+      </div>
+      <div>
+        <p class="label m-0 text-ash-mist">Contact</p>
+        <a class="link-quiet label mt-3 inline-block" href={`mailto:${site.email}`}>
+          {site.email}
+        </a>
+      </div>
+      <div>
+        <p class="label m-0 text-ash-mist">Elsewhere</p>
+        <ul class="list-none m-0 mt-3 p-0 flex flex-col gap-1">
+          {
+            site.socials.map((s) => (
+              <li>
+                <a class="link-quiet label" href={s.href} rel="noopener" target="_blank">
+                  {s.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+    <p class="label text-felt-gray mt-16 mb-0">&copy; {year} {site.name}</p>
+  </div>
+</footer>

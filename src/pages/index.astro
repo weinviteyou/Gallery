@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroIridescent from '../components/HeroIridescent.astro';
+import ArtworkRow from '../components/ArtworkRow.astro';
+import EmptyState from '../components/EmptyState.astro';
+import PillButton from '../components/PillButton.astro';
+import { getFeatured } from '../lib/artworks';
+import { site } from '../../site.config';
+
+const featured = getFeatured(6);
+---
+
+<BaseLayout inverseNav>
+  <HeroIridescent headline={site.heroHeadline} statement={site.heroStatement} full />
+
+  <section id="work" class="section">
+    <div class="shell">
+      <div class="flex items-baseline justify-between mb-14">
+        <p class="label text-felt-gray m-0">Selected work</p>
+        <a href="/gallery" class="link-quiet label">All work</a>
+      </div>
+
+      {
+        featured.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div class="flex flex-col" style="gap: calc(var(--section-gap) * 1.6)">
+            {featured.map((artwork, i) => (
+              <ArtworkRow artwork={artwork} index={i} flip={i % 2 === 1} />
+            ))}
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <section id="about" class="section band-dark">
+    <div class="shell grid gap-10 md:grid-cols-12">
+      <p class="label text-ash-mist m-0 md:col-span-3">{site.about.heading}</p>
+      <div class="md:col-span-9">
+        <p class="text-heading-sm font-light m-0 max-w-[24ch]">{site.tagline}</p>
+        <div class="mt-10 max-w-[62ch]">
+          {site.about.paragraphs.map((p) => <p class="text-body mt-0 mb-6">{p}</p>)}
+        </div>
+        <PillButton href="/about" class="mt-4">Read more</PillButton>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="section">
+    <div class="shell">
+      <p class="label text-felt-gray m-0 mb-8">Contact</p>
+      <p class="text-heading font-light m-0 max-w-[16ch]">
+        Enquiries about available work are welcome.
+      </p>
+      <PillButton href={`mailto:${site.email}`} class="mt-12">
+        {site.email}
+      </PillButton>
+    </div>
+  </section>
+</BaseLayout>

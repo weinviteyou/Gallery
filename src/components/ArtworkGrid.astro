@@ -1,0 +1,99 @@
+---
+import { Image } from 'astro:assets';
+import {
+  activeCategories,
+  categoryLabels,
+  imageFor,
+  slugFor,
+  type Artwork,
+} from '../lib/artworks';
+
+interface Props {
+  artworks: Artwork[];
+}
+
+const { artworks } = Astro.props;
+const categories = activeCategories();
+const showFilter = categories.length > 1;
+---
+
+{
+  showFilter && (
+    <div class="flex flex-wrap gap-3 mb-14" role="group" aria-label="Filter by category">
+      <button class="pill is-active" data-filter="all" aria-pressed="true">
+        All
+      </button>
+      {categories.map((c) => (
+        <button class="pill" data-filter={c} aria-pressed="false">
+          {categoryLabels[c]}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+<div class="flex flex-col" style="gap: calc(var(--section-gap) * 1.4)" data-grid>
+  {
+    artworks.map((artwork, i) => {
+      const image = imageFor(artwork);
+      return (
+        <article data-category={artwork.category} class="grid gap-x-10 gap-y-5 md:grid-cols-12">
+          <div class="md:col-span-9">
+            <a href={`/art/${slugFor(artwork)}`} class="media-reveal block link-quiet">
+              {image && (
+                <Image
+                  src={image}
+                  alt={artwork.title}
+                  widths={[640, 960, 1280, 1600]}
+                  sizes="(min-width: 768px) 72vw, 100vw"
+                  loading={i < 2 ? 'eager' : 'lazy'}
+                />
+              )}
+            </a>
+          </div>
+          <div class="md:col-span-3 self-end pb-2">
+            <h2 class="text-body-sm font-normal m-0">
+              <a href={`/art/${slugFor(artwork)}`} class="link-quiet">
+                {artwork.title}
+              </a>
+            </h2>
+            <p class="label text-felt-gray mt-3 mb-0">
+              {[categoryLabels[artwork.category], artwork.year].filter(Boolean).join(' — ')}
+            </p>
+          </div>
+        </article>
+      );
+    })
+  }
+</div>
+
+<p class="label text-felt-gray mt-16 mb-0 hidden" data-no-results>
+  No work in this category.
+</p>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+  const items = document.querySelectorAll<HTMLElement>('[data-grid] > article');
+  const noResults = document.querySelector<HTMLElement>('[data-no-results]');
+
+  buttons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const filter = button.dataset.filter;
+
+      buttons.forEach((b) => {
+        const active = b === button;
+        b.classList.toggle('is-active', active);
+        b.setAttribute('aria-pressed', String(active));
+      });
+
+      let shown = 0;
+      items.forEach((item) => {
+        const match = filter === 'all' || item.dataset.category === filter;
+        item.hidden = !match;
+        if (match) shown += 1;
+      });
+
+      noResults?.classList.toggle('hidden', shown > 0);
+    });
+  });
+</script>

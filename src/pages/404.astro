@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PillButton from '../components/PillButton.astro';
+---
+
+<BaseLayout title="Not found">
+  <section class="shell pt-40 pb-32">
+    <p class="label text-felt-gray m-0 mb-6">404</p>
+    <h1 class="text-heading font-light m-0 max-w-[16ch]">This page is not on the wall.</h1>
+    <PillButton href="/" class="mt-12">Return home</PillButton>
+  </section>
+</BaseLayout>

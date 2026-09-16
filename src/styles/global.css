@@ -1,0 +1,206 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+
+@theme {
+  /* Colors - monochrome interface palette. No chromatic UI color, ever. */
+  --color-obsidian: #000000;
+  --color-paper: #ffffff;
+  --color-inkstone: #181818;
+  --color-slate-pill: #636363;
+  --color-felt-gray: #6d6d6d;
+  --color-pewter: #808080;
+  --color-ash-mist: #9a9a9a;
+
+  /* Typography */
+  --font-display: 'Inter Variable', Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --text-label: 11px;
+  --text-label--line-height: 1.32;
+  --text-caption: 12px;
+  --text-caption--line-height: 1.19;
+  --text-body-sm: 16px;
+  --text-body-sm--line-height: 1.15;
+  --text-body: 18px;
+  --text-body--line-height: 1.58;
+  --text-subheading: clamp(26px, 4vw, 39px);
+  --text-subheading--line-height: 1.19;
+  --text-subheading-lg: clamp(30px, 4.6vw, 45px);
+  --text-subheading-lg--line-height: 1.15;
+  --text-heading-sm: clamp(32px, 5.4vw, 54px);
+  --text-heading-sm--line-height: 1.39;
+  --text-heading: clamp(38px, 7.6vw, 78px);
+  --text-heading--line-height: 1.1;
+  --text-heading-lg: clamp(44px, 9.2vw, 94px);
+  --text-heading-lg--line-height: 0.76;
+  --text-display: clamp(56px, 16vw, 225px);
+  --text-display--line-height: 0.76;
+
+  /* Spacing - 4px base unit, spacious density */
+  --spacing: 4px;
+
+  /* Radii - pills for buttons and tags only, everything else stays sharp */
+  --radius-pill: 75px;
+
+  /* Motion */
+  --ease-glide: cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+@layer base {
+  :root {
+    --container-editorial: 1078px;
+    --section-gap: 46px;
+    --element-gap: 14px;
+    --card-padding: 34px;
+    --gradient-iridescent: linear-gradient(
+      90deg,
+      rgb(160, 224, 171),
+      rgb(255, 172, 46) 50%,
+      rgb(165, 45, 37)
+    );
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-obsidian);
+    font-family: var(--font-display);
+    font-size: var(--text-body);
+    line-height: 1.58;
+    font-weight: 400;
+  }
+
+  /* Editorial contract: sharp corners on every surface. */
+  img,
+  figure,
+  input,
+  textarea,
+  select {
+    border-radius: 0;
+  }
+
+  ::selection {
+    background: var(--color-obsidian);
+    color: var(--color-paper);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .shell {
+    width: 100%;
+    max-width: var(--container-editorial);
+    margin-inline: auto;
+    padding-inline: 20px;
+  }
+
+  .section {
+    padding-block: calc(var(--section-gap) * 1.6);
+  }
+
+  .band-dark {
+    background: var(--color-obsidian);
+    color: var(--color-paper);
+  }
+
+  /* Quiet 11px label register used for metadata and nav. */
+  .label {
+    font-size: var(--text-label);
+    line-height: 1.32;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
+  /* Ghost pill - the one expressive gesture in the system. */
+  .pill {
+    display: inline-block;
+    border-radius: var(--radius-pill);
+    border: 1px solid currentColor;
+    background: transparent;
+    padding: 11px 33px;
+    font-size: var(--text-body-sm);
+    font-weight: 400;
+    line-height: 1.15;
+    cursor: pointer;
+    transition:
+      letter-spacing 0.8s var(--ease-glide),
+      border-color 0.8s var(--ease-glide),
+      color 0.4s ease,
+      background-color 0.4s ease;
+  }
+
+  .pill:hover {
+    letter-spacing: 0.06em;
+  }
+
+  .pill[aria-pressed='true'],
+  .pill.is-active {
+    background: var(--color-obsidian);
+    color: var(--color-paper);
+  }
+
+  .band-dark .pill[aria-pressed='true'],
+  .band-dark .pill.is-active {
+    background: var(--color-paper);
+    color: var(--color-obsidian);
+  }
+
+  .link-quiet {
+    text-decoration: none;
+    border-radius: 0;
+    transition: color 0.4s ease, opacity 0.4s ease;
+  }
+
+  .link-quiet:hover {
+    color: var(--color-felt-gray);
+  }
+
+  .band-dark .link-quiet:hover {
+    color: var(--color-ash-mist);
+  }
+
+  .hairline {
+    border-top: 1px solid var(--color-obsidian);
+  }
+
+  .band-dark .hairline {
+    border-top-color: var(--color-paper);
+  }
+
+  /* Media-only accent. Never applied to interface chrome. */
+  .iridescent {
+    background: var(--gradient-iridescent);
+  }
+
+  .media-reveal {
+    overflow: hidden;
+  }
+
+  .media-reveal img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform 1.25s var(--ease-glide);
+  }
+
+  .media-reveal:hover img {
+    transform: scale(1.03);
+  }
+}

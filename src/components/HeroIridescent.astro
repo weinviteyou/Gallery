@@ -1,0 +1,28 @@
+---
+interface Props {
+  headline: string;
+  statement?: string;
+  /** Full viewport height on the home page, shorter on inner pages. */
+  full?: boolean;
+}
+
+const { headline, statement, full = false } = Astro.props;
+---
+
+<section
+  class:list={[
+    'iridescent relative flex flex-col justify-end overflow-hidden',
+    full ? 'min-h-svh' : 'min-h-[52svh]',
+  ]}
+>
+  <!-- Wash keeps the display type legible over the gradient without tinting it. -->
+  <div class="absolute inset-0 bg-obsidian/25 pointer-events-none"></div>
+  <div class="shell relative pb-16 pt-40 text-paper">
+    <h1 class="text-display font-normal m-0 tracking-[-0.02em]">{headline}</h1>
+    {
+      statement && (
+        <p class="text-heading font-light max-w-[18ch] mt-10 mb-0">{statement}</p>
+      )
+    }
+  </div>
+</section>

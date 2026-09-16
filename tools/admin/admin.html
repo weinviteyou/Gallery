@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gallery admin</title>
+    <style>
+      :root {
+        --obsidian: #000000;
+        --paper: #ffffff;
+        --felt-gray: #6d6d6d;
+        --ash-mist: #9a9a9a;
+        --glide: cubic-bezier(0.19, 1, 0.22, 1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--obsidian);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .shell {
+        max-width: 1078px;
+        margin: 0 auto;
+        padding: 48px 20px 120px;
+      }
+
+      .label {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      h1 {
+        font-size: 54px;
+        font-weight: 400;
+        line-height: 1.1;
+        margin: 0;
+        letter-spacing: -0.02em;
+      }
+
+      .muted {
+        color: var(--felt-gray);
+      }
+
+      .banner {
+        border: 1px solid var(--obsidian);
+        padding: 16px 20px;
+        margin: 28px 0 40px;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 32px;
+      }
+
+      .pill {
+        border-radius: 75px;
+        border: 1px solid currentColor;
+        background: transparent;
+        color: inherit;
+        padding: 10px 26px;
+        font: inherit;
+        font-size: 14px;
+        cursor: pointer;
+        transition: letter-spacing 0.8s var(--glide), background-color 0.3s ease,
+          color 0.3s ease;
+      }
+
+      .pill:hover:not(:disabled) {
+        letter-spacing: 0.05em;
+      }
+
+      .pill:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .pill.solid {
+        background: var(--obsidian);
+        color: var(--paper);
+      }
+
+      .status {
+        font-size: 12px;
+        color: var(--felt-gray);
+        margin-left: auto;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 132px 1fr auto;
+        gap: 20px;
+        border-top: 1px solid var(--obsidian);
+        padding: 20px 0;
+        align-items: start;
+        background: var(--paper);
+      }
+
+      .row[data-hidden='true'] .thumb,
+      .row[data-hidden='true'] .fields {
+        opacity: 0.38;
+      }
+
+      .row.dragging {
+        opacity: 0.4;
+      }
+
+      .row.drop-target {
+        border-top: 2px solid var(--obsidian);
+      }
+
+      .thumb {
+        width: 132px;
+        aspect-ratio: 1;
+        object-fit: cover;
+        display: block;
+        background: #f2f2f2;
+        border-radius: 0;
+        cursor: grab;
+      }
+
+      .fields {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px 14px;
+      }
+
+      .fields .full {
+        grid-column: 1 / -1;
+      }
+
+      input[type='text'],
+      select,
+      textarea {
+        width: 100%;
+        border: 1px solid #d8d8d8;
+        border-radius: 0;
+        padding: 9px 11px;
+        font: inherit;
+        font-size: 14px;
+        background: var(--paper);
+        color: inherit;
+      }
+
+      input[type='text']:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--obsidian);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 60px;
+      }
+
+      .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+        min-width: 132px;
+      }
+
+      .toggle {
+        border: 1px solid var(--obsidian);
+        border-radius: 75px;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        font-size: 12px;
+        padding: 8px 14px;
+        cursor: pointer;
+        text-align: center;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      .toggle[aria-pressed='true'] {
+        background: var(--obsidian);
+        color: var(--paper);
+      }
+
+      .danger {
+        border: none;
+        background: none;
+        color: var(--felt-gray);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        padding: 6px 0 0;
+      }
+
+      .danger:hover {
+        color: var(--obsidian);
+      }
+
+      .missing {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #a02d25;
+        margin: 0 0 6px;
+      }
+
+      .empty {
+        border-top: 1px solid var(--obsidian);
+        padding-top: 24px;
+        color: var(--felt-gray);
+        font-size: 14px;
+      }
+
+      .dropzone {
+        border: 1px dashed var(--ash-mist);
+        padding: 28px;
+        text-align: center;
+        color: var(--felt-gray);
+        font-size: 13px;
+        margin-bottom: 32px;
+      }
+
+      .dropzone.over {
+        border-color: var(--obsidian);
+        color: var(--obsidian);
+      }
+
+      .savebar {
+        position: sticky;
+        bottom: 0;
+        background: var(--paper);
+        border-top: 1px solid var(--obsidian);
+        padding: 14px 0;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 8px;
+      }
+
+      @media (max-width: 720px) {
+        .row {
+          grid-template-columns: 1fr;
+        }
+        .fields {
+          grid-template-columns: 1fr;
+        }
+        .thumb {
+          width: 100%;
+          aspect-ratio: 3 / 2;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="shell">
+      <p class="label muted" style="margin: 0 0 18px">Local tool — not published</p>
+      <h1>Gallery admin</h1>
+
+      <div class="banner">
+        Switch on only the work that should be public. Changes save to
+        <strong>src/data/artworks.json</strong>. The live site updates only after you run
+        <strong>npm run build</strong> and deploy.
+      </div>
+
+      <div class="dropzone" id="dropzone">
+        Drop image files here to copy them into <strong>src/assets/art/</strong>
+      </div>
+
+      <div class="toolbar">
+        <button class="pill" id="scan">Scan folder</button>
+        <button class="pill" id="showAll">Show all</button>
+        <button class="pill" id="hideAll">Hide all</button>
+        <span class="status" id="status"></span>
+      </div>
+
+      <div id="list"></div>
+
+      <div class="savebar">
+        <button class="pill solid" id="save" disabled>Save changes</button>
+        <button class="pill" id="reload">Discard and reload</button>
+        <span class="status" id="count"></span>
+      </div>
+    </div>
+
+    <script type="module">
+      const listEl = document.getElementById('list');
+      const statusEl = document.getElementById('status');
+      const countEl = document.getElementById('count');
+      const saveBtn = document.getElementById('save');
+      const dropzone = document.getElementById('dropzone');
+
+      let artworks = [];
+      let dirty = false;
+      let dragId = null;
+
+      const CATEGORIES = [
+        ['painting', 'Painting'],
+        ['photograph', 'Photograph'],
+      ];
+
+      function setStatus(message) {
+        statusEl.textContent = message;
+      }
+
+      function markDirty(value = true) {
+        dirty = value;
+        saveBtn.disabled = !value;
+      }
+
+      function updateCount() {
+        const visible = artworks.filter((a) => a.visible).length;
+        const featured = artworks.filter((a) => a.visible && a.featured).length;
+        countEl.textContent = `${artworks.length} works — ${visible} public, ${featured} featured`;
+      }
+
+      function field(artwork, key, placeholder, className = '') {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = artwork[key] ?? '';
+        input.placeholder = placeholder;
+        if (className) input.className = className;
+        input.addEventListener('input', () => {
+          artwork[key] = input.value;
+          markDirty();
+        });
+        return input;
+      }
+
+      function render() {
+        listEl.textContent = '';
+
+        if (artworks.length === 0) {
+          const empty = document.createElement('p');
+          empty.className = 'empty';
+          empty.textContent =
+            'No artworks yet. Drop images above, or copy them into src/assets/art/ and press Scan folder.';
+          listEl.append(empty);
+          updateCount();
+          return;
+        }
+
+        for (const artwork of artworks) {
+          const row = document.createElement('div');
+          row.className = 'row';
+          row.dataset.id = artwork.id;
+          row.dataset.hidden = String(!artwork.visible);
+          row.draggable = true;
+
+          const thumb = document.createElement('img');
+          thumb.className = 'thumb';
+          thumb.src = `/art/${encodeURIComponent(artwork.file)}`;
+          thumb.alt = artwork.title;
+          thumb.title = 'Drag to reorder';
+          thumb.addEventListener('error', () => {
+            thumb.style.visibility = 'hidden';
+          });
+
+          const fields = document.createElement('div');
+          fields.className = 'fields';
+
+          if (artwork.missing) {
+            const warn = document.createElement('p');
+            warn.className = 'missing full';
+            warn.textContent = 'File not found in src/assets/art/';
+            fields.append(warn);
+          }
+
+          const title = field(artwork, 'title', 'Title', 'full');
+          fields.append(title);
+
+          const category = document.createElement('select');
+          for (const [value, text] of CATEGORIES) {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = text;
+            if (artwork.category === value) option.selected = true;
+            category.append(option);
+          }
+          category.addEventListener('change', () => {
+            artwork.category = category.value;
+            markDirty();
+          });
+          fields.append(category);
+
+          fields.append(field(artwork, 'year', 'Year'));
+          fields.append(field(artwork, 'medium', 'Medium'));
+          fields.append(field(artwork, 'dimensions', 'Dimensions'));
+
+          const description = document.createElement('textarea');
+          description.className = 'full';
+          description.placeholder = 'Description (optional)';
+          description.value = artwork.description ?? '';
+          description.addEventListener('input', () => {
+            artwork.description = description.value;
+            markDirty();
+          });
+          fields.append(description);
+
+          const filename = document.createElement('p');
+          filename.className = 'label muted full';
+          filename.style.margin = '2px 0 0';
+          filename.textContent = artwork.file;
+          fields.append(filename);
+
+          const actions = document.createElement('div');
+          actions.className = 'actions';
+
+          const visible = document.createElement('button');
+          visible.className = 'toggle';
+          visible.setAttribute('aria-pressed', String(Boolean(artwork.visible)));
+          visible.textContent = artwork.visible ? 'Public' : 'Hidden';
+          visible.addEventListener('click', () => {
+            artwork.visible = !artwork.visible;
+            if (!artwork.visible) artwork.featured = false;
+            markDirty();
+            render();
+          });
+
+          const featured = document.createElement('button');
+          featured.className = 'toggle';
+          featured.setAttribute('aria-pressed', String(Boolean(artwork.featured)));
+          featured.textContent = artwork.featured ? 'Featured' : 'Not featured';
+          featured.disabled = !artwork.visible;
+          featured.addEventListener('click', () => {
+            artwork.featured = !artwork.featured;
+            markDirty();
+            render();
+          });
+
+          const remove = document.createElement('button');
+          remove.className = 'danger';
+          remove.textContent = 'Remove from list';
+          remove.addEventListener('click', () => {
+            artworks = artworks.filter((a) => a.id !== artwork.id);
+            markDirty();
+            render();
+          });
+
+          actions.append(visible, featured, remove);
+          row.append(thumb, fields, actions);
+
+          row.addEventListener('dragstart', () => {
+            dragId = artwork.id;
+            row.classList.add('dragging');
+          });
+          row.addEventListener('dragend', () => {
+            dragId = null;
+            row.classList.remove('dragging');
+            listEl.querySelectorAll('.row').forEach((r) => r.classList.remove('drop-target'));
+          });
+          row.addEventListener('dragover', (event) => {
+            if (!dragId || dragId === artwork.id) return;
+            event.preventDefault();
+            row.classList.add('drop-target');
+          });
+          row.addEventListener('dragleave', () => row.classList.remove('drop-target'));
+          row.addEventListener('drop', (event) => {
+            if (!dragId || dragId === artwork.id) return;
+            event.preventDefault();
+            event.stopPropagation();
+            const from = artworks.findIndex((a) => a.id === dragId);
+            const to = artworks.findIndex((a) => a.id === artwork.id);
+            const [moved] = artworks.splice(from, 1);
+            artworks.splice(to, 0, moved);
+            markDirty();
+            render();
+          });
+
+          listEl.append(row);
+        }
+
+        updateCount();
+      }
+
+      async function load() {
+        const response = await fetch('/api/artworks');
+        const data = await response.json();
+        artworks = data.artworks;
+        markDirty(false);
+        render();
+        setStatus('Loaded.');
+      }
+
+      async function save() {
+        setStatus('Saving...');
+        const response = await fetch('/api/artworks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ artworks }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          setStatus(`Error: ${data.error}`);
+          return;
+        }
+        artworks = data.artworks;
+        markDirty(false);
+        render();
+        setStatus('Saved. Run npm run build to publish.');
+      }
+
+      async function scan() {
+        setStatus('Scanning...');
+        const response = await fetch('/api/scan', { method: 'POST' });
+        const data = await response.json();
+        const missing = new Set(data.missing);
+        artworks = data.artworks.map((a) => ({ ...a, missing: missing.has(a.file) }));
+        markDirty(false);
+        render();
+        setStatus(
+          `${data.added} new file${data.added === 1 ? '' : 's'} added as hidden.` +
+            (data.missing.length ? ` ${data.missing.length} entr(y/ies) missing from disk.` : '')
+        );
+      }
+
+      async function uploadFiles(files) {
+        const images = [...files].filter((f) => /\.(jpe?g|png|webp|avif)$/i.test(f.name));
+        if (images.length === 0) {
+          setStatus('No supported image files in that drop.');
+          return;
+        }
+        setStatus(`Uploading ${images.length} file(s)...`);
+        for (const file of images) {
+          await fetch(`/api/upload?name=${encodeURIComponent(file.name)}`, {
+            method: 'POST',
+            body: file,
+          });
+        }
+        await scan();
+      }
+
+      document.getElementById('scan').addEventListener('click', scan);
+      document.getElementById('save').addEventListener('click', save);
+      document.getElementById('reload').addEventListener('click', load);
+
+      document.getElementById('showAll').addEventListener('click', () => {
+        artworks.forEach((a) => {
+          a.visible = true;
+        });
+        markDirty();
+        render();
+      });
+
+      document.getElementById('hideAll').addEventListener('click', () => {
+        artworks.forEach((a) => {
+          a.visible = false;
+          a.featured = false;
+        });
+        markDirty();
+        render();
+      });
+
+      for (const type of ['dragenter', 'dragover']) {
+        dropzone.addEventListener(type, (event) => {
+          event.preventDefault();
+          dropzone.classList.add('over');
+        });
+      }
+      for (const type of ['dragleave', 'drop']) {
+        dropzone.addEventListener(type, () => dropzone.classList.remove('over'));
+      }
+      dropzone.addEventListener('drop', (event) => {
+        event.preventDefault();
+        uploadFiles(event.dataTransfer.files);
+      });
+      window.addEventListener('dragover', (event) => event.preventDefault());
+      window.addEventListener('drop', (event) => event.preventDefault());
+
+      window.addEventListener('beforeunload', (event) => {
+        if (!dirty) return;
+        event.preventDefault();
+        event.returnValue = '';
+      });
+
+      load();
+    </script>
+  </body>
+</html>
