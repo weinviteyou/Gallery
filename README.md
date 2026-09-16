@@ -62,7 +62,7 @@ Set `site` in `astro.config.mjs` to the final URL first (used for canonical tags
 
 ```bash
 npm run build
-npx wrangler pages deploy dist --project-name art-gallery
+npx wrangler pages deploy dist --project-name gallery
 ```
 
 ## Layout
