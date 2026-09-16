@@ -1,1 +1,41 @@
-[]
+[
+  {
+    "id": "0d7ef8d2",
+    "file": "modern starry night.png",
+    "title": "Modern Starry Night",
+    "category": "painting",
+    "year": "",
+    "medium": "",
+    "dimensions": "",
+    "description": "",
+    "visible": true,
+    "featured": false,
+    "order": 1
+  },
+  {
+    "id": "bc570136",
+    "file": "monalisa geng.png",
+    "title": "Monalisa Geng",
+    "category": "painting",
+    "year": "",
+    "medium": "",
+    "dimensions": "",
+    "description": "",
+    "visible": true,
+    "featured": false,
+    "order": 2
+  },
+  {
+    "id": "e157bfa4",
+    "file": "angel.png",
+    "title": "Angel",
+    "category": "painting",
+    "year": "",
+    "medium": "",
+    "dimensions": "",
+    "description": "",
+    "visible": true,
+    "featured": false,
+    "order": 3
+  }
+]
